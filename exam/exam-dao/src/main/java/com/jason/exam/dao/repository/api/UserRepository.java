@@ -15,11 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer>,JpaSpecific
 
 	@Query(value="select * from tb_user where 1=1 and phone = ?1",nativeQuery=true)
 	User findUserByPhone(String phone);
-	
-	
 
-
-	
-	
-	
+	@Query(value="select * from tb_user where iphone_uuid = ?1",nativeQuery=true)
+	User findByIPhoneUuid(String iPhoneUuid);
 }

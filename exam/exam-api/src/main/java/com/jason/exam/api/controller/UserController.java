@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import com.jason.exam.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -120,6 +121,36 @@ public class UserController
 			return R.isFail(e);
 		}
     }
+
+	/**
+	 * 苹果游客登录
+	 */
+	@RequestMapping("guest")
+	@ResponseBody
+	public R guest(@RequestParam Map<String, String> params,HttpSession session)
+	{
+		try {
+			String iPhoneUuid = params.get("iPhoneUuid");
+			String planUuid = params.get("planUuid");
+
+			User user = userService.guest(iPhoneUuid,planUuid);
+			String uuid = user.getUuid();
+			Map<String, Object> temp = new HashMap<>();
+			temp.put("nickname",user.getNickname());
+			temp.put("uuid",uuid);
+			String sessionId = session.getId();
+			temp.put("sessionId", sessionId);
+			GuavaUtil.userSession.put((String) temp.get("uuid"),sessionId);
+			//获取vip的信息
+			Map<String, Object> vip = userService.getVipInfo(uuid,planUuid);
+			temp.putAll(vip);
+			return R.isOk().data(temp);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return R.isFail(e);
+		}
+	}
     
     
     

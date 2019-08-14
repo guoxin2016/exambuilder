@@ -124,5 +124,27 @@ public class UserServiceImpl implements IUserService {
 		return true;
 	}
 
-	
+	@Override
+	public User guest(String iPhoneUuid, String planUuid) {
+		//先判断这个手机的uuid有没有
+		if(StringUtils.isNotBlank(iPhoneUuid)) {
+			User user = userRepository.findByIPhoneUuid(iPhoneUuid);
+			if(user==null){
+				user = new User();
+				user.setCreate_time(new Date());
+				user.setNickname("游客");
+				user.setPlan_uuid(planUuid);
+				user.setPwd(iPhoneUuid);
+				user.setPwdmd5(MD5Util2.MD5(iPhoneUuid));
+				user.setStatus(1);
+				user.setUuid(UUIDTool.getUUID());
+				user.setIphone_uuid(iPhoneUuid);
+				user = userRepository.saveAndFlush(user);
+			}
+			return user;
+		}
+		return null;
+	}
+
+
 }

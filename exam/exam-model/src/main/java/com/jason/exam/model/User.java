@@ -35,7 +35,11 @@ public class User implements Serializable {
     private String pwdmd5;    	//pwdmd5
     private String qq;    		//qq
     private String email;    	//email
+    private String iphone_uuid;    	//email
     private int status;    	//开始时间
+
+
+
 	public Integer getId() {
 		return id;
 	}
@@ -110,5 +114,12 @@ public class User implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-    
+
+	public String getIphone_uuid() {
+		return iphone_uuid;
+	}
+
+	public void setIphone_uuid(String iphone_uuid) {
+		this.iphone_uuid = iphone_uuid;
+	}
 }

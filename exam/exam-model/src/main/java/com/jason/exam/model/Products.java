@@ -36,7 +36,11 @@ public class Products implements Serializable {
     private String discount_price;  //折扣价格
     private String purchase_price;  //原价
     private String vip_level;  //原价
-    private String ios_product_id;  //ios产品id
+
+
+
+	private String ios_product_id;  //ios产品id
+	private String ios_price;  //苹果的价格
     
     
 	public Integer getId() {
@@ -110,5 +114,13 @@ public class Products implements Serializable {
 	}
 	public void setIos_product_id(String ios_product_id) {
 		this.ios_product_id = ios_product_id;
+	}
+
+	public String getIos_price() {
+		return ios_price;
+	}
+
+	public void setIos_price(String ios_price) {
+		this.ios_price = ios_price;
 	}
 }

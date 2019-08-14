@@ -100,7 +100,7 @@ public class ApplePayController {
 				//支付成功
 				//更新用户权限
 				//先更新用户权限
-				Order order = orderService.findOrderByUUid(orderUuid);
+				Order order = orderService.findOrderByCode(orderUuid);
 				if(order!=null) {
 					payService.updateUserAuth(order);
 					//更新order 的状态
@@ -113,7 +113,7 @@ public class ApplePayController {
 					//支付成功
 						//更新用户权限
 						//先更新用户权限
-						Order order = orderService.findOrderByUUid(orderUuid);
+						Order order = orderService.findOrderByCode(orderUuid);
 						if(order!=null) {
 							payService.updateUserAuth(order);
 							//更新order 的状态

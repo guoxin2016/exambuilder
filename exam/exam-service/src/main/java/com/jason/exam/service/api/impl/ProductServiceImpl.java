@@ -38,7 +38,7 @@ public class ProductServiceImpl implements IProductService {
         p0.setPlan_uuid(planId);
         p0.setDesc("去除应用中所有广告。");
         p0.setVip_level("0");
-        p0.setIos_product_id("BDYP00000001");
+        p0.setIos_product_id("CJHS00000001");
         productsList.add(p0);
         
         Products p1 = new Products();
@@ -51,7 +51,7 @@ public class ProductServiceImpl implements IProductService {
         p1.setPlan_uuid(planId);
         p1.setDesc("月会员");
         p1.setVip_level("1");
-        p1.setIos_product_id("BDYP00000002");
+        p1.setIos_product_id("CJHS00000002");
         productsList.add(p1);
         
         Products p2 = new Products();
@@ -64,7 +64,7 @@ public class ProductServiceImpl implements IProductService {
         p2.setPlan_uuid(planId);
         p2.setDesc("季会员");
         p2.setVip_level("1");
-        p2.setIos_product_id("BDYP00000003");
+        p2.setIos_product_id("CJHS00000003");
         productsList.add(p2);
         
         Products p4 = new Products();
@@ -77,7 +77,7 @@ public class ProductServiceImpl implements IProductService {
         p4.setPlan_uuid(planId);
         p4.setDesc("半年会员");
         p4.setVip_level("1");
-        p4.setIos_product_id("BDYP00000004");
+        p4.setIos_product_id("CJHS00000004");
         productsList.add(p4);
         
         Products p3 = new Products();
@@ -90,7 +90,7 @@ public class ProductServiceImpl implements IProductService {
         p3.setPlan_uuid(planId);
         p3.setDesc("年会员");
         p3.setVip_level("1");
-        p3.setIos_product_id("BDYP00000005");
+        p3.setIos_product_id("CJHS00000005");
         productsList.add(p3);
         
         for (Products product : productsList)

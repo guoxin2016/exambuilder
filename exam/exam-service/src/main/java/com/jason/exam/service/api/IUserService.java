@@ -1,5 +1,7 @@
 package com.jason.exam.service.api;
 
+import com.jason.exam.model.User;
+
 import java.util.Map;
 
 public interface IUserService {
@@ -12,5 +14,5 @@ public interface IUserService {
 
 	boolean checkPhone(String phone);
 
-
+	User guest(String iPhoneUuid, String planUuid);
 }

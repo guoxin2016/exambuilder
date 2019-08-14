@@ -21,11 +21,11 @@ public class OrderServiceImpl implements IOrderService {
 
 	@Override
 	public Order genOrder(Map<String, String> parmas) {
-		String user_uuid = parmas.get("user_uuid");
-		String product_uuid = parmas.get("product_uuid");
-		int pay_type = Integer.valueOf(parmas.get("pay_type"));
+		String user_uuid = parmas.get("userUuid");
+		String product_uuid = parmas.get("productUuid");
+		int pay_type = Integer.valueOf(parmas.get("payType"));
 		String amount = parmas.get("amount");
-		String product_name = parmas.get("product_name");
+		String product_name = parmas.get("productName");
 		String channel = parmas.get("channel");
 		Order order = new Order();
 		order.setCode(getOrderIdByTime());
