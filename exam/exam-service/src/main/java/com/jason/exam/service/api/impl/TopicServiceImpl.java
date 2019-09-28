@@ -570,46 +570,360 @@ public class TopicServiceImpl implements ITopicService {
 							topicTypeRepository.save(topicType);
 						}
 
-						JSONArray topics = topictype.getJSONArray("questionList");
-						for (int h = 0; h < topics.size(); h++) {
-							String uuid = topics.getString(h);
-
-							MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
-							postData3.add("mtype", "GetExamDetail");
-							postData3.add("id", uuid);
-							postData3.add("orgID", "wuyou.100xuexi.com");
-							HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
-									postData3, headers);
-							String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
-							JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
-
-							TopicOldExam topicOldExam = topicOldExamRepository
-									.findTopicOldExamByQidAndQno(topicObj.getString("qid"), topicObj.getString("qNO"));
-							if (topicOldExam == null) {
-								topicOldExam = new TopicOldExam();
-								topicOldExam.setUuid(UUIDTool.getUUID());
-								topicOldExam.setTitle(topicObj.getString("QuestionContent"));
-								topicOldExam.setAnalysis(topicObj.getString("QuestionAnalysis"));
-								topicOldExam.setScore(topicObj.getString("QuestionScore"));
-								topicOldExam.setAnswer(topicObj.getString("answer"));
-								topicOldExam.setType(topicObj.getString("typeName"));
-								topicOldExam.setType_tow(topicType.getUuid());
-								topicOldExam.setTitle_parent(topicObj.getString("QuestionContentParent"));
-								topicOldExam.setCreate_time(new Date());
-								topicOldExam.setSelect_answer(topicObj.getString("selectAnswer"));
-								topicOldExam.setOld_exam_uuid(oldExam.getUuid());
-								topicOldExam.setThird_party_qid(topicObj.getString("qid"));
-								topicOldExam.setThird_party_qno(topicObj.getString("qNO"));
-								topicOldExam.setStatus(1);
-								topicOldExamRepository.save(topicOldExam);
+						if("A1/A2型选择题".equals(name)) {
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<String> topicList = new ArrayList<>();
+							for (int h = 0; h < topics.size(); h++) {
+								topicList.add(topics.getString(h));
 							}
+							Collections.shuffle(topicList);
+							Collections.shuffle(topicList);
+
+							for (int h = 0; h < topicList.size(); h++) {
+								String uuid = topicList.get(h);
+
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicOldExam topicOldExam = topicOldExamRepository
+										.findTopicOldExamByQidAndQno(topicObj.getString("qid"), topicObj.getString("qNO"));
+								if (topicOldExam == null) {
+									topicOldExam = new TopicOldExam();
+									topicOldExam.setUuid(UUIDTool.getUUID());
+									topicOldExam.setTitle(topicObj.getString("QuestionContent"));
+									topicOldExam.setAnalysis(topicObj.getString("QuestionAnalysis"));
+									topicOldExam.setScore(topicObj.getString("QuestionScore"));
+
+									String answer = topicObj.getString("answer");
+									String selectAnswer = topicObj.getString("selectAnswer");
+									topicOldExam.setAnswer_real(answer);
+									topicOldExam.setSelect_answer_real(selectAnswer);
+
+									List<String> temp = getRandomAnswer(selectAnswer, answer);
+									topicOldExam.setSelect_answer(temp.get(0));
+									topicOldExam.setAnswer(temp.get(1));
+
+									topicOldExam.setType(topicObj.getString("typeName"));
+									topicOldExam.setType_tow(topicType.getUuid());
+									topicOldExam.setTitle_parent(topicObj.getString("QuestionContentParent"));
+									topicOldExam.setCreate_time(new Date());
+
+									topicOldExam.setOld_exam_uuid(oldExam.getUuid());
+									topicOldExam.setThird_party_qid(topicObj.getString("qid"));
+									topicOldExam.setThird_party_qno(topicObj.getString("qNO"));
+									topicOldExam.setStatus(1);
+									topicOldExamRepository.save(topicOldExam);
+								}
+							}
+						}else if("B1型选择题".equals(name)){
+
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<TopicOldExam> oldExams = new ArrayList<>();
+							for (int h = 0; h < topics.size(); h++) {
+								String uuid = topics.getString(h);
+
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicOldExam oldExam1 = new TopicOldExam();
+
+								oldExam1.setUuid(UUIDTool.getUUID());
+								oldExam1.setTitle(topicObj.getString("QuestionContent"));
+								oldExam1.setAnalysis(topicObj.getString("QuestionAnalysis"));
+								oldExam1.setScore(topicObj.getString("QuestionScore"));
+								String answer = topicObj.getString("answer");
+								String questionContentParent = topicObj.getString("QuestionContentParent");
+								oldExam1.setAnswer_real(answer);
+								oldExam1.setSelect_answer_real(questionContentParent);
+//										List<String> temp = getRandomAnswerForBA3A4(questionContentParent, answer);
+								oldExam1.setSelect_answer(topicObj.getString("selectAnswer"));
+								oldExam1.setTitle_parent(questionContentParent);
+								oldExam1.setAnswer(answer);
+
+								oldExam1.setType(topicObj.getString("typeName"));
+								oldExam1.setType_tow(topicType.getUuid());
+
+								oldExam1.setCreate_time(new Date());
+								oldExam1.setOld_exam_uuid(oldExam.getUuid());
+								oldExam1.setStatus(1);
+
+								oldExams.add(oldExam1);
+
+							}
+							Collections.shuffle(oldExams);
+							Collections.shuffle(oldExams);
+							ArrayListMultimap<String,TopicOldExam> topicsMultimap = ArrayListMultimap.create();
+							for(int p=0;p<oldExams.size();p++){
+								topicsMultimap.put(oldExams.get(p).getTitle_parent(),oldExams.get(p));
+							}
+							List<TopicOldExam> topicChaptersTemp = new ArrayList<>();
+							Set<String> titleParent = topicsMultimap.keySet();
+							titleParent.forEach((s)->{
+								topicChaptersTemp.addAll(getRandomAnswerForOldExamB(topicsMultimap.get(s)));
+							});
+
+							topicChaptersTemp.forEach((topicOldExam)->{
+								topicOldExamRepository.save(topicOldExam);
+							});
+						}else if("A3/A4型选择题".equals(name)){
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<TopicOldExam> topicOldExams = new ArrayList<>();
+
+							for (int h = 0; h < topics.size(); h++) {
+								String uuid = topics.getString(h);
+
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicOldExam oldExam1 = new TopicOldExam();
+
+								oldExam1.setUuid(UUIDTool.getUUID());
+								oldExam1.setTitle(topicObj.getString("QuestionContent"));
+								oldExam1.setAnalysis(topicObj.getString("QuestionAnalysis"));
+								oldExam1.setScore(topicObj.getString("QuestionScore"));
+								String answer = topicObj.getString("answer");
+								String selectAnswer = topicObj.getString("selectAnswer");
+								oldExam1.setAnswer_real(answer);
+								oldExam1.setSelect_answer_real(selectAnswer);
+								List<String> temp = getRandomAnswer(selectAnswer, answer);
+								oldExam1.setSelect_answer(temp.get(0));
+								oldExam1.setAnswer(temp.get(1));
+
+								oldExam1.setType(topicObj.getString("typeName"));
+								oldExam1.setType_tow(topicType.getUuid());
+								oldExam1.setTitle_parent(topicObj.getString("QuestionContentParent"));
+								oldExam1.setCreate_time(new Date());
+								oldExam1.setOld_exam_uuid(oldExam.getUuid());
+								oldExam1.setStatus(1);
+								topicOldExams.add(oldExam1);
+							}
+							Collections.shuffle(topicOldExams);
+							Collections.shuffle(topicOldExams);
+							ArrayListMultimap<String,TopicOldExam> topicsMultimap = ArrayListMultimap.create();
+							for(int p=0;p<topicOldExams.size();p++){
+								topicsMultimap.put(topicOldExams.get(p).getTitle_parent(),topicOldExams.get(p));
+							}
+							List<TopicOldExam> topicChaptersTemp = new ArrayList<>();
+							Set<String> titleParent = topicsMultimap.keySet();
+							titleParent.forEach((s)->{
+								topicChaptersTemp.addAll(topicsMultimap.get(s));
+							});
+							topicChaptersTemp.forEach((topicOldExam)->{
+								topicOldExamRepository.save(topicOldExam);
+							});
 						}
 					}
 				}
 			}
-
 		}
+	}
 
+	public static List<TopicOldExam> getRandomAnswerForOldExamB(List<TopicOldExam> oldExams){
+		Map<String,Integer> tempA1 = new HashMap<>();
+		tempA1.put("A",0);
+		tempA1.put("B",1);
+		tempA1.put("C",2);
+		tempA1.put("D",3);
+		tempA1.put("E",4);
+		tempA1.put("F",5);
+		tempA1.put("G",6);
+		tempA1.put("H",7);
+		tempA1.put("I",8);
+		tempA1.put("J",9);
+		Map<Integer,String> temp1A = new HashMap<>();
+		temp1A.put(0,"A");
+		temp1A.put(1,"B");
+		temp1A.put(2,"C");
+		temp1A.put(3,"D");
+		temp1A.put(4,"E");
+		temp1A.put(5,"F");
+		temp1A.put(6,"G");
+		temp1A.put(7,"H");
+		temp1A.put(8,"I");
+		temp1A.put(9,"J");
+		//每组题的公共选项
+		String questionContentParent = oldExams.get(0).getTitle_parent();
+		//选项处理
+		List<String> options = Stream.of(questionContentParent.split("<br />")).collect(Collectors.toList());
+		options.remove(0);
+		List<String> optionsTemp = new ArrayList<>();
+		List<String> lastOptions = new ArrayList<>();
+		for (String s: options) {
+			if(s.startsWith("A.")){
+				optionsTemp.add(s.replace("A.",""));
+				lastOptions.add(s.replace("A.",""));
+			}
+			if(s.startsWith("B.")){
+				optionsTemp.add(s.replace("B.",""));
+				lastOptions.add(s.replace("B.",""));
+			}
+			if(s.startsWith("C.")){
+				optionsTemp.add(s.replace("C.",""));
+				lastOptions.add(s.replace("C.",""));
+			}
+			if(s.startsWith("D.")){
+				optionsTemp.add(s.replace("D.",""));
+				lastOptions.add(s.replace("D.",""));
+			}
+			if(s.startsWith("E.")){
+				optionsTemp.add(s.replace("E.",""));
+				lastOptions.add(s.replace("E.",""));
+			}
+			if(s.startsWith("F.")){
+				optionsTemp.add(s.replace("F.",""));
+				lastOptions.add(s.replace("F.",""));
+			}
+			if(s.startsWith("G.")){
+				optionsTemp.add(s.replace("G.",""));
+				lastOptions.add(s.replace("G.",""));
+			}
+		}
+		Collections.shuffle(lastOptions);
+		Collections.shuffle(lastOptions);
+
+		//循环每一道题目
+		for (TopicOldExam oldExam:oldExams) {
+			String answer = oldExam.getAnswer();
+			List<String> answers = Stream.of(answer.split(",")).collect(Collectors.toList());
+			List<String> answerOptions = new ArrayList<>();
+			List<String> lastAnswers = new ArrayList<>();
+
+			for(int i=0;i<answers.size();i++){
+				answerOptions.add(optionsTemp.get(tempA1.get(answers.get(i).toUpperCase())));
+			};
+
+			for(int i=0;i<lastOptions.size();i++){
+				if(answerOptions.contains(lastOptions.get(i))){
+					lastAnswers.add(temp1A.get(i));
+				}
+			}
+			Collections.sort(lastAnswers);
+
+
+
+			List<String> lastOptions1 = new ArrayList<>();
+			for(int i=0;i<lastOptions.size();i++){
+				lastOptions1.add(temp1A.get(i)+"."+lastOptions.get(i));
+			}
+
+
+			oldExam.setTitle_parent("（公共选项）"+String.join("<br />", lastOptions));
+			oldExam.setAnswer(String.join(",", lastAnswers));
+		}
+		return oldExams;
+	}
+
+	public static List<TopicSimulation> getRandomAnswerForSimulationB(List<TopicSimulation> topicSimulations){
+		Map<String,Integer> tempA1 = new HashMap<>();
+		tempA1.put("A",0);
+		tempA1.put("B",1);
+		tempA1.put("C",2);
+		tempA1.put("D",3);
+		tempA1.put("E",4);
+		tempA1.put("F",5);
+		tempA1.put("G",6);
+		tempA1.put("H",7);
+		tempA1.put("I",8);
+		tempA1.put("J",9);
+		Map<Integer,String> temp1A = new HashMap<>();
+		temp1A.put(0,"A");
+		temp1A.put(1,"B");
+		temp1A.put(2,"C");
+		temp1A.put(3,"D");
+		temp1A.put(4,"E");
+		temp1A.put(5,"F");
+		temp1A.put(6,"G");
+		temp1A.put(7,"H");
+		temp1A.put(8,"I");
+		temp1A.put(9,"J");
+		//每组题的公共选项
+		String questionContentParent = topicSimulations.get(0).getTitle_parent();
+		//选项处理
+		List<String> options = Stream.of(questionContentParent.split("<br />")).collect(Collectors.toList());
+		options.remove(0);
+		List<String> optionsTemp = new ArrayList<>();
+		List<String> lastOptions = new ArrayList<>();
+		for (String s: options) {
+			if(s.startsWith("A.")){
+				optionsTemp.add(s.replace("A.",""));
+				lastOptions.add(s.replace("A.",""));
+			}
+			if(s.startsWith("B.")){
+				optionsTemp.add(s.replace("B.",""));
+				lastOptions.add(s.replace("B.",""));
+			}
+			if(s.startsWith("C.")){
+				optionsTemp.add(s.replace("C.",""));
+				lastOptions.add(s.replace("C.",""));
+			}
+			if(s.startsWith("D.")){
+				optionsTemp.add(s.replace("D.",""));
+				lastOptions.add(s.replace("D.",""));
+			}
+			if(s.startsWith("E.")){
+				optionsTemp.add(s.replace("E.",""));
+				lastOptions.add(s.replace("E.",""));
+			}
+			if(s.startsWith("F.")){
+				optionsTemp.add(s.replace("F.",""));
+				lastOptions.add(s.replace("F.",""));
+			}
+			if(s.startsWith("G.")){
+				optionsTemp.add(s.replace("G.",""));
+				lastOptions.add(s.replace("G.",""));
+			}
+		}
+		Collections.shuffle(lastOptions);
+		Collections.shuffle(lastOptions);
+
+		//循环每一道题目
+		for (TopicSimulation topicSimulation:topicSimulations) {
+			String answer = topicSimulation.getAnswer();
+			List<String> answers = Stream.of(answer.split(",")).collect(Collectors.toList());
+			List<String> answerOptions = new ArrayList<>();
+			List<String> lastAnswers = new ArrayList<>();
+
+			for(int i=0;i<answers.size();i++){
+				answerOptions.add(optionsTemp.get(tempA1.get(answers.get(i).toUpperCase())));
+			};
+
+			for(int i=0;i<lastOptions.size();i++){
+				if(answerOptions.contains(lastOptions.get(i))){
+					lastAnswers.add(temp1A.get(i));
+				}
+			}
+			Collections.sort(lastAnswers);
+
+
+
+			List<String> lastOptions1 = new ArrayList<>();
+			for(int i=0;i<lastOptions.size();i++){
+				lastOptions1.add(temp1A.get(i)+"."+lastOptions.get(i));
+			}
+
+
+			topicSimulation.setTitle_parent("（公共选项）"+String.join("<br />", lastOptions));
+			topicSimulation.setAnswer(String.join(",", lastAnswers));
+		}
+		return topicSimulations;
 	}
 
 	@Override
@@ -686,33 +1000,158 @@ public class TopicServiceImpl implements ITopicService {
 							topicTypeRepository.save(topicType);
 						}
 
-						JSONArray topics = topictype.getJSONArray("questionList");
-						for (int h = 0; h < topics.size(); h++) {
-							String uuid = topics.getString(h);
+						if("A1/A2型选择题".equals(name)) {
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<String> topicList = new ArrayList<>();
+							for (int h = 0; h < topics.size(); h++) {
+								topicList.add(topics.getString(h));
+							}
+							Collections.shuffle(topicList);
+							Collections.shuffle(topicList);
 
-							MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
-							postData3.add("mtype", "GetExamDetail");
-							postData3.add("id", uuid);
-							postData3.add("orgID", "wuyou.100xuexi.com");
-							HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
-									postData3, headers);
-							String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
-							JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+							for (int h = 0; h < topicList.size(); h++) {
+								String uuid = topicList.get(h);
 
-							TopicSimulation topicSimulation = new TopicSimulation();
-							topicSimulation.setUuid(UUIDTool.getUUID());
-							topicSimulation.setTitle(topicObj.getString("QuestionContent"));
-							topicSimulation.setAnalysis(topicObj.getString("QuestionAnalysis"));
-							topicSimulation.setScore(topicObj.getString("QuestionScore"));
-							topicSimulation.setAnswer(topicObj.getString("answer"));
-							topicSimulation.setType(topicObj.getString("typeName"));
-							topicSimulation.setType_tow(topicType.getUuid());
-							topicSimulation.setTitle_parent(topicObj.getString("QuestionContentParent"));
-							topicSimulation.setCreate_time(new Date());
-							topicSimulation.setSelect_answer(topicObj.getString("selectAnswer"));
-							topicSimulation.setSimulation_uuid(simulation.getUuid());
-							topicSimulation.setStatus(1);
-							topicSimulationRepository.save(topicSimulation);
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicSimulation topicSimulation = new TopicSimulation();
+								topicSimulation.setUuid(UUIDTool.getUUID());
+								topicSimulation.setTitle(topicObj.getString("QuestionContent"));
+								topicSimulation.setAnalysis(topicObj.getString("QuestionAnalysis"));
+								topicSimulation.setScore(topicObj.getString("QuestionScore"));
+
+								String answer = topicObj.getString("answer");
+								String selectAnswer = topicObj.getString("selectAnswer");
+								topicSimulation.setAnswer_real(answer);
+								topicSimulation.setSelect_answer_real(selectAnswer);
+
+								List<String> temp = getRandomAnswer(selectAnswer, answer);
+								topicSimulation.setSelect_answer(temp.get(0));
+								topicSimulation.setAnswer(temp.get(1));
+
+								topicSimulation.setType(topicObj.getString("typeName"));
+								topicSimulation.setType_tow(topicType.getUuid());
+								topicSimulation.setTitle_parent(topicObj.getString("QuestionContentParent"));
+								topicSimulation.setCreate_time(new Date());
+								topicSimulation.setSimulation_uuid(simulation.getUuid());
+								topicSimulation.setStatus(1);
+								topicSimulationRepository.save(topicSimulation);
+							}
+						}else if("B1型选择题".equals(name)){
+
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<TopicSimulation> simulations = new ArrayList<>();
+							for (int h = 0; h < topics.size(); h++) {
+								String uuid = topics.getString(h);
+
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicSimulation simulation1 = new TopicSimulation();
+
+								simulation1.setUuid(UUIDTool.getUUID());
+								simulation1.setTitle(topicObj.getString("QuestionContent"));
+								simulation1.setAnalysis(topicObj.getString("QuestionAnalysis"));
+								simulation1.setScore(topicObj.getString("QuestionScore"));
+								String answer = topicObj.getString("answer");
+								String questionContentParent = topicObj.getString("QuestionContentParent");
+								simulation1.setAnswer_real(answer);
+								simulation1.setSelect_answer_real(questionContentParent);
+//										List<String> temp = getRandomAnswerForBA3A4(questionContentParent, answer);
+								simulation1.setSelect_answer(topicObj.getString("selectAnswer"));
+								simulation1.setTitle_parent(questionContentParent);
+								simulation1.setAnswer(answer);
+
+								simulation1.setType(topicObj.getString("typeName"));
+								simulation1.setType_tow(topicType.getUuid());
+
+								simulation1.setCreate_time(new Date());
+								simulation1.setSimulation_uuid(simulation.getUuid());
+								simulation1.setStatus(1);
+
+								simulations.add(simulation1);
+
+							}
+							Collections.shuffle(simulations);
+							Collections.shuffle(simulations);
+							ArrayListMultimap<String,TopicSimulation> topicsMultimap = ArrayListMultimap.create();
+							for(int p=0;p<simulations.size();p++){
+								topicsMultimap.put(simulations.get(p).getTitle_parent(),simulations.get(p));
+							}
+							List<TopicSimulation> topicSimulationsTemp = new ArrayList<>();
+							Set<String> titleParent = topicsMultimap.keySet();
+							titleParent.forEach((s)->{
+								topicSimulationsTemp.addAll(getRandomAnswerForSimulationB(topicsMultimap.get(s)));
+							});
+
+							topicSimulationsTemp.forEach((topicSimulation)->{
+								topicSimulationRepository.save(topicSimulation);
+							});
+						}else if("A3/A4型选择题".equals(name)){
+							JSONArray topics = topictype.getJSONArray("questionList");
+							List<TopicSimulation> topicSimulations = new ArrayList<>();
+
+							for (int h = 0; h < topics.size(); h++) {
+								String uuid = topics.getString(h);
+
+								MultiValueMap<String, String> postData3 = new LinkedMultiValueMap<String, String>();
+								postData3.add("mtype", "GetExamDetail");
+								postData3.add("id", uuid);
+								postData3.add("orgID", "wuyou.100xuexi.com");
+								HttpEntity<MultiValueMap<String, String>> request3 = new HttpEntity<MultiValueMap<String, String>>(
+										postData3, headers);
+								String json3 = restTemplate.postForEntity(uri, request3, String.class).getBody();
+								JSONObject topicObj = JSONObject.parseObject(json3).getJSONObject("data");
+
+								TopicSimulation topicSimulation = new TopicSimulation();
+
+								topicSimulation.setUuid(UUIDTool.getUUID());
+								topicSimulation.setTitle(topicObj.getString("QuestionContent"));
+								topicSimulation.setAnalysis(topicObj.getString("QuestionAnalysis"));
+								topicSimulation.setScore(topicObj.getString("QuestionScore"));
+								String answer = topicObj.getString("answer");
+								String selectAnswer = topicObj.getString("selectAnswer");
+								topicSimulation.setAnswer_real(answer);
+								topicSimulation.setSelect_answer_real(selectAnswer);
+								List<String> temp = getRandomAnswer(selectAnswer, answer);
+								topicSimulation.setSelect_answer(temp.get(0));
+								topicSimulation.setAnswer(temp.get(1));
+
+								topicSimulation.setType(topicObj.getString("typeName"));
+								topicSimulation.setType_tow(topicType.getUuid());
+								topicSimulation.setTitle_parent(topicObj.getString("QuestionContentParent"));
+								topicSimulation.setCreate_time(new Date());
+								topicSimulation.setSimulation_uuid(simulation.getUuid());
+								topicSimulation.setStatus(1);
+								topicSimulations.add(topicSimulation);
+							}
+							Collections.shuffle(topicSimulations);
+							Collections.shuffle(topicSimulations);
+							ArrayListMultimap<String,TopicSimulation> topicsMultimap = ArrayListMultimap.create();
+							for(int p=0;p<topicSimulations.size();p++){
+								topicsMultimap.put(topicSimulations.get(p).getTitle_parent(),topicSimulations.get(p));
+							}
+							List<TopicSimulation> topicSimulationsTemp = new ArrayList<>();
+							Set<String> titleParent = topicsMultimap.keySet();
+							titleParent.forEach((s)->{
+								topicSimulationsTemp.addAll(topicsMultimap.get(s));
+							});
+							topicSimulationsTemp.forEach((topicSimulation)->{
+								topicSimulationRepository.save(topicSimulation);
+							});
 						}
 					}
 				}
