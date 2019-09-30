@@ -29,11 +29,13 @@ public class TopicMustDo implements Serializable {
 	private String analysis; // 分析
 	private String score; // 分值
 	private String answer; // 答案
+	private String answer_real; // 答案
 	private String type; // 类型
 	private String type_tow;           //题目类型
 	private String title_parent; //       公共题干
 	private String select_answer; //     选择选项  
 	private Date create_time; // 创建时间
+	private String select_answer_real; //     选择选项
 	
 	private String menu_mustdo_uuid; // 题目分类 uuid
 	private int status; // 状态
@@ -115,5 +117,20 @@ public class TopicMustDo implements Serializable {
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	
+
+	public String getAnswer_real() {
+		return answer_real;
+	}
+
+	public void setAnswer_real(String answer_real) {
+		this.answer_real = answer_real;
+	}
+
+	public String getSelect_answer_real() {
+		return select_answer_real;
+	}
+
+	public void setSelect_answer_real(String select_answer_real) {
+		this.select_answer_real = select_answer_real;
+	}
 }

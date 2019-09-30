@@ -372,13 +372,19 @@ public class TopicServiceImpl implements ITopicService {
 		temp1A.put(7,"H");
 		temp1A.put(8,"I");
 		temp1A.put(9,"J");
+		System.out.println(selectAnswer);
+		System.out.println(answer);
 		List<String> options = Stream.of(selectAnswer.split("\\|")).collect(Collectors.toList());
 		List<String> answers = Stream.of(answer.split(",")).collect(Collectors.toList());
 		List<String> answerOptions = new ArrayList<>();
 		List<String> lastAnswers = new ArrayList<>();
 
 		for(int i=0;i<answers.size();i++){
-			answerOptions.add(options.get(tempA1.get(answers.get(i).toUpperCase())));
+			String answer2 = answers.get(i).toUpperCase().trim();
+			answer2 = answer2.replace("　","");
+			int index = tempA1.get(answer2.trim());
+			String optionTemp = options.get(index);
+			answerOptions.add(optionTemp);
 		};
 		Collections.shuffle(options);
 		for(int i=0;i<options.size();i++){
@@ -926,6 +932,137 @@ public class TopicServiceImpl implements ITopicService {
 		return topicSimulations;
 	}
 
+	public static List<TopicMustDo> getRandomAnswerForMustDoB(List<TopicMustDo> topicMustDos){
+		Map<String,Integer> tempA1 = new HashMap<>();
+		tempA1.put("A",0);
+		tempA1.put("B",1);
+		tempA1.put("C",2);
+		tempA1.put("D",3);
+		tempA1.put("E",4);
+		tempA1.put("F",5);
+		tempA1.put("G",6);
+		tempA1.put("H",7);
+		tempA1.put("I",8);
+		tempA1.put("J",9);
+		Map<Integer,String> temp1A = new HashMap<>();
+		temp1A.put(0,"A");
+		temp1A.put(1,"B");
+		temp1A.put(2,"C");
+		temp1A.put(3,"D");
+		temp1A.put(4,"E");
+		temp1A.put(5,"F");
+		temp1A.put(6,"G");
+		temp1A.put(7,"H");
+		temp1A.put(8,"I");
+		temp1A.put(9,"J");
+		//每组题的公共选项
+		String questionContentParent = topicMustDos.get(0).getTitle_parent();
+		//选项处理
+		List<String> options = Stream.of(questionContentParent.split("<br>")).collect(Collectors.toList());
+		options.remove(0);
+		List<String> optionsTemp = new ArrayList<>();
+		List<String> lastOptions = new ArrayList<>();
+		for (String s: options) {
+			if(s.startsWith("A.")){
+				optionsTemp.add(s.replace("A.",""));
+				lastOptions.add(s.replace("A.",""));
+			}
+			if(s.startsWith("A．") ){
+				optionsTemp.add(s.replace("A．",""));
+				lastOptions.add(s.replace("A．",""));
+			}
+			if(s.startsWith("B.")){
+				optionsTemp.add(s.replace("B.",""));
+				lastOptions.add(s.replace("B.",""));
+			}
+			if(s.startsWith("B．")){
+				optionsTemp.add(s.replace("B．",""));
+				lastOptions.add(s.replace("B．",""));
+			}
+			if(s.startsWith("C.")){
+				optionsTemp.add(s.replace("C.",""));
+				lastOptions.add(s.replace("C.",""));
+			}
+			if(s.startsWith("C．")){
+				optionsTemp.add(s.replace("C．",""));
+				lastOptions.add(s.replace("C．",""));
+			}
+			if(s.startsWith("D.")){
+				optionsTemp.add(s.replace("D.",""));
+				lastOptions.add(s.replace("D.",""));
+			}
+			if(s.startsWith("D．")){
+				optionsTemp.add(s.replace("D．",""));
+				lastOptions.add(s.replace("D．",""));
+			}
+			if(s.startsWith("E.")){
+				optionsTemp.add(s.replace("E.",""));
+				lastOptions.add(s.replace("E.",""));
+			}
+			if(s.startsWith("E．")){
+				optionsTemp.add(s.replace("E．",""));
+				lastOptions.add(s.replace("E．",""));
+			}
+			if(s.startsWith("F.")){
+				optionsTemp.add(s.replace("F.",""));
+				lastOptions.add(s.replace("F.",""));
+			}
+			if(s.startsWith("F．")){
+				optionsTemp.add(s.replace("F．",""));
+				lastOptions.add(s.replace("F．",""));
+			}
+			if(s.startsWith("G.")){
+				optionsTemp.add(s.replace("G.",""));
+				lastOptions.add(s.replace("G.",""));
+			}
+			if(s.startsWith("G．")){
+				optionsTemp.add(s.replace("G．",""));
+				lastOptions.add(s.replace("G．",""));
+			}
+		}
+		Collections.shuffle(lastOptions);
+		Collections.shuffle(lastOptions);
+
+		//循环每一道题目
+		for (TopicMustDo topicMustDo:topicMustDos) {
+			String answer = topicMustDo.getAnswer().trim();
+			List<String> answers = Stream.of(answer.split(",")).collect(Collectors.toList());
+			List<String> answerOptions = new ArrayList<>();
+			List<String> lastAnswers = new ArrayList<>();
+
+			for(int i=0;i<answers.size();i++){
+				String answer2 = answers.get(i).toUpperCase().trim();
+				answer2 = answer2.replace("　","");
+				if(answer2.endsWith("；")){
+					answer2 = answer2.substring(0,answer2.length()-1);
+				}
+				int index = tempA1.get(answer2.trim());
+				System.out.println(optionsTemp);
+				String optionTemp = optionsTemp.get(index);
+				answerOptions.add(optionTemp);
+			};
+
+			for(int i=0;i<lastOptions.size();i++){
+				if(answerOptions.contains(lastOptions.get(i))){
+					lastAnswers.add(temp1A.get(i));
+				}
+			}
+			Collections.sort(lastAnswers);
+
+
+
+			List<String> lastOptions1 = new ArrayList<>();
+			for(int i=0;i<lastOptions.size();i++){
+				lastOptions1.add(temp1A.get(i)+"."+lastOptions.get(i));
+			}
+
+
+			topicMustDo.setTitle_parent("（公共选项）"+String.join("<br />", lastOptions));
+			topicMustDo.setAnswer(String.join(",", lastAnswers));
+		}
+		return topicMustDos;
+	}
+
 	@Override
 	public void getSimulationTopic(String planId) {
 		// 获取目录
@@ -1196,6 +1333,7 @@ public class TopicServiceImpl implements ITopicService {
 						topicMenuMustDo.setStatus(1);
 						topicMenuMustdoRepository.save(topicMenuMustDo);
 
+//						if (true && "chap15.html".equals(as.attr("href"))) {
 						if (true) {
 							// 获取每一个章节的题目
 							Document doc2 = Jsoup.connect(baseurl + as.attr("href")).get();
@@ -1207,17 +1345,24 @@ public class TopicServiceImpl implements ITopicService {
 							String select_answer = "";
 							String title_parent = "";
 							TopicMustDo topicMustDo = new TopicMustDo();
+
+
+							List<TopicMustDo> topicA12MustDos = new ArrayList<>();
+							List<TopicMustDo> topicBMustDos = new ArrayList<>();
+							List<TopicMustDo> topicA34MustDos = new ArrayList<>();
+
 							for (int k = 0; k < ps2.size(); k++) {
 								Element p2 = ps2.get(k);
 								if (!p2.hasClass("ArtH1") && !p2.hasClass("ArtH1") && !p2.hasClass("PSplit")
 										&& !p2.hasClass("FreePoint") && !"".equals(p2.text().trim())) {
-									String pText = p2.text().trim(); // p标签内容
+									String pText = p2.text().trim(); // p标签内容s
+									System.out.println(pText);
 									// 题型处理
-									if (pText.contains("A1/A2") || pText.contains("B1") || pText.contains("A3/A4")) { // 当前题型
+									if (pText.contains("A1/A2") || (!pText.contains("维生素B1") && pText.contains("B1")) || pText.contains("A3/A4")) { // 当前题型
 										if (pText.contains("A1") || pText.contains("A2")) {
 											pText = "A1/A2型选择题";
 										}
-										if (pText.contains("B1") || pText.contains("B")) {
+										if (!pText.contains("维生素B1") && (pText.contains("B1") || pText.contains("B"))) {
 											pText = "B1型选择题";
 										}
 										if (pText.contains("A3") || pText.contains("A4")) {
@@ -1240,7 +1385,7 @@ public class TopicServiceImpl implements ITopicService {
 									if (pText.contains("A3/A4")) {
 										topic_type = "A3";
 									}
-									if (pText.contains("B1")) {
+									if ((!pText.contains("维生素B1") && pText.contains("B1"))) {
 										topic_type = "B";
 									}
 									if (pText.contains("共用题干")) {
@@ -1287,6 +1432,7 @@ public class TopicServiceImpl implements ITopicService {
 											|| (p2.children().size() > 0 && p2.child(0).hasClass("ComTag"))) {// 答案
 										pText = pText.replace("【答案】", "").replace("\n", " ");
 										if ("B".equals(topic_type) && pText.length() > 6) {
+
 											String[] titles = topicMustDo.getTitle().split("\\|");
 											pText = pText.replaceAll(" +", "|");
 											System.out.println("----" + pText);
@@ -1297,11 +1443,14 @@ public class TopicServiceImpl implements ITopicService {
 												topicMustDo.setTitle(titles[l]);
 												if (answers[l].contains("．")) {
 													topicMustDo.setAnswer(answers[l].split("．")[1]);
+													topicMustDo.setAnswer_real(answers[l].split("．")[1]);
 												} else if (answers[l].contains(".")) {
 													topicMustDo.setAnswer(answers[l].split("\\.")[1]);
+													topicMustDo.setAnswer_real(answers[l].split("\\.")[1]);
 												}
 												topicMustDo.setAnalysis("");
 												topicMustDo.setTitle_parent(title_parent);
+												topicMustDo.setSelect_answer_real(title_parent);
 												topicMustDo.setUuid(UUIDTool.getUUID());
 												topicMustDo.setScore("1");
 												topicMustDo.setStatus(1);
@@ -1310,16 +1459,23 @@ public class TopicServiceImpl implements ITopicService {
 												topicMustDo.setSelect_answer("");
 												topicMustDo.setMenu_mustdo_uuid(topicMenuMustDo.getUuid());
 
-												topicMustdoRepository.save(topicMustDo);
+//												topicMustdoRepository.save(topicMustDo);
+												topicBMustDos.add(topicMustDo);
 												topicMustDo = null;
 												topicMustDo = new TopicMustDo();
 											}
 											select_answer = "";
+
 											// [0].split("．")[1]);
 											// System.out.println(s.split("\\|")[1].split("．")[1]);
 
 										} else {
-											topicMustDo.setAnswer(pText);
+
+											topicMustDo.setAnswer_real(pText);
+											topicMustDo.setSelect_answer_real(select_answer);
+											List<String> temp = getRandomAnswer(select_answer,pText);
+											topicMustDo.setAnswer(temp.get(1));
+											topicMustDo.setSelect_answer(temp.get(0));
 											topicMustDo.setAnalysis("");
 											topicMustDo.setTitle_parent(title_parent);
 											topicMustDo.setType_tow(topic_type_uuid);
@@ -1328,9 +1484,14 @@ public class TopicServiceImpl implements ITopicService {
 											topicMustDo.setStatus(1);
 											topicMustDo.setType(topic_type.equals("A1") ? "single" : "compose");
 											topicMustDo.setCreate_time(new Date());
-											topicMustDo.setSelect_answer(select_answer);
 											topicMustDo.setMenu_mustdo_uuid(topicMenuMustDo.getUuid());
-											topicMustdoRepository.save(topicMustDo);
+//											topicMustdoRepository.save(topicMustDo);
+											if(topic_type.equals("A1")){
+												topicA12MustDos.add(topicMustDo);
+											}else{
+												topicA34MustDos.add(topicMustDo);
+											}
+
 											topicMustDo = null;
 											topicMustDo = new TopicMustDo();
 											select_answer = "";
@@ -1339,6 +1500,42 @@ public class TopicServiceImpl implements ITopicService {
 									lastptext = pText;
 								}
 							}
+							//处理A12
+							topicA12MustDos.forEach(topicMustDo1 -> {
+								topicMustdoRepository.save(topicMustDo1);
+							});
+							// 处理B
+							Collections.shuffle(topicBMustDos);
+							Collections.shuffle(topicBMustDos);
+							ArrayListMultimap<String,TopicMustDo> topicsMultimap = ArrayListMultimap.create();
+							for(int p=0;p<topicBMustDos.size();p++){
+								topicsMultimap.put(topicBMustDos.get(p).getTitle_parent(),topicBMustDos.get(p));
+							}
+							List<TopicMustDo> topicMustDosTemp = new ArrayList<>();
+							Set<String> titleParent = topicsMultimap.keySet();
+							titleParent.forEach((s)->{
+								topicMustDosTemp.addAll(getRandomAnswerForMustDoB(topicsMultimap.get(s)));
+							});
+
+							topicMustDosTemp.forEach((topicMustDo1)->{
+								topicMustdoRepository.save(topicMustDo1);
+							});
+
+							//处理A34
+							Collections.shuffle(topicA34MustDos);
+							Collections.shuffle(topicA34MustDos);
+							ArrayListMultimap<String,TopicMustDo> topicsMultimap2 = ArrayListMultimap.create();
+							for(int p=0;p<topicA34MustDos.size();p++){
+								topicsMultimap2.put(topicA34MustDos.get(p).getTitle_parent(),topicA34MustDos.get(p));
+							}
+							List<TopicMustDo> topicMustDosTemp2 = new ArrayList<>();
+							Set<String> titleParent2 = topicsMultimap2.keySet();
+							titleParent2.forEach((s)->{
+								topicMustDosTemp2.addAll(topicsMultimap2.get(s));
+							});
+							topicMustDosTemp2.forEach((topicMustDo1)->{
+								topicMustdoRepository.save(topicMustDo1);
+							});
 						}
 					}
 				}
